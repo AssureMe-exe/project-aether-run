@@ -1,0 +1,425 @@
+/* ==========================================================================
+Project Aether Run - Complete Style Engine
+Theme: Vibrant Modern Dark-Mode / Arcade Glow Aesthetics
+========================================================================== */
+
+/* --- RESET & GLOBAL VARIABLES --- */
+:root {
+--bg-primary: #121218;
+--bg-secondary: #1e1e2d;
+--bg-card: #28283d;
+--bg-card-hover: #33334e;
+
+--accent-gold: #ffcc00;
+--accent-gold-glow: rgba(255, 204, 0, 0.4);
+--accent-cyan: #00e5ff;
+--accent-cyan-glow: rgba(0, 229, 255, 0.4);
+--accent-red: #ff3366;
+--accent-green: #00e676;
+--accent-purple: #ab47bc;
+
+--text-primary: #ffffff;
+--text-muted: #a0a0c0;
+
+--border-color: #3d3d5c;
+--border-radius: 12px;
+--font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+user-select: none;
+}
+
+body {
+background: var(--bg-primary);
+color: var(--text-primary);
+font-family: var(--font-family);
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+overflow: hidden;
+background-image:
+radial-gradient(circle at 50% 20%, rgba(0, 229, 255, 0.05) 0%, transparent 50%),
+radial-gradient(circle at 80% 80%, rgba(255, 204, 0, 0.03) 0%, transparent 40%);
+}
+
+/* --- MAIN GAME CONTAINER --- */
+#game-container {
+width: 960px;
+height: 640px;
+background: var(--bg-secondary);
+border: 3px solid var(--border-color);
+border-radius: 16px;
+position: relative;
+box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 229, 255, 0.1);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+/* --- SCREEN VISIBILITY MANAGEMENT --- */
+.screen {
+display: none;
+flex-direction: column;
+width: 100%;
+height: 100%;
+padding: 24px;
+position: absolute;
+top: 0;
+left: 0;
+opacity: 0;
+transition: opacity 0.3s ease;
+}
+
+.screen.active {
+display: flex;
+opacity: 1;
+z-index: 10;
+}
+
+/* --- TYPOGRAPHY & BUTTONS --- */
+h1 {
+font-size: 36px;
+color: var(--accent-gold);
+text-transform: uppercase;
+letter-spacing: 2px;
+text-shadow: 0 0 15px var(--accent-gold-glow);
+margin-bottom: 12px;
+}
+
+h2 {
+font-size: 24px;
+color: var(--accent-cyan);
+margin-bottom: 16px;
+}
+
+h3 {
+font-size: 18px;
+color: var(--text-primary);
+margin-bottom: 8px;
+}
+
+p {
+color: var(--text-muted);
+font-size: 14px;
+line-height: 1.5;
+}
+
+button, .btn {
+background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+color: #121218;
+border: none;
+padding: 12px 24px;
+font-weight: 700;
+font-size: 15px;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+
+button:hover, .btn:hover {
+transform: translateY(-2px) scale(1.03);
+box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
+}
+
+button:active, .btn:active {
+transform: translateY(1px) scale(0.98);
+}
+
+button.secondary {
+background: var(--bg-card);
+color: var(--text-primary);
+border: 2px solid var(--border-color);
+box-shadow: none;
+}
+
+button.secondary:hover {
+background: var(--bg-card-hover);
+border-color: var(--accent-cyan);
+box-shadow: 0 0 15px var(--accent-cyan-glow);
+}
+
+/* --- COMBAT SCREEN HUD --- */
+#hud {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: var(--bg-primary);
+padding: 12px 20px;
+border-radius: var(--border-radius);
+border: 1px solid var(--border-color);
+margin-bottom: 16px;
+box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.hud-stat {
+display: flex;
+align-items: center;
+gap: 8px;
+font-weight: 600;
+font-size: 15px;
+}
+
+.hud-stat span {
+color: var(--accent-gold);
+}
+
+/* Ultimate Soul Ember Gauge */
+.ultimate-container {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+#ultimate-bar-outer {
+width: 180px;
+height: 18px;
+background: #1a1a26;
+border: 2px solid #3d3d5c;
+border-radius: 10px;
+overflow: hidden;
+position: relative;
+}
+
+#ultimate-fill {
+width: 0%;
+height: 100%;
+background: linear-gradient(90deg, #00e5ff 0%, #00e676 100%);
+box-shadow: 0 0 12px var(--accent-cyan-glow);
+transition: width 0.4s ease-out;
+}
+
+#ultimate-fill.ready {
+background: linear-gradient(90deg, #ff0055 0%, #ffcc00 100%);
+animation: pulse-glow 1.2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+0% { box-shadow: 0 0 8px rgba(255, 0, 85, 0.6); }
+100% { box-shadow: 0 0 20px rgba(255, 204, 0, 0.9); }
+}
+
+/* --- COMBAT BATTLEFIELD --- */
+#battlefield {
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex: 1;
+position: relative;
+gap: 20px;
+perspective: 1000px;
+}
+
+.combat-column {
+display: flex;
+flex-direction: column;
+gap: 16px;
+width: 260px;
+z-index: 2;
+}
+
+/* Character & Enemy Cards */
+.entity-card {
+background: var(--bg-card);
+border: 2px solid var(--border-color);
+border-radius: var(--border-radius);
+padding: 12px 16px;
+position: relative;
+cursor: grab;
+transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.entity-card:hover {
+border-color: var(--accent-cyan);
+box-shadow: 0 0 15px var(--accent-cyan-glow);
+transform: translateY(-2px);
+}
+
+.entity-card:active {
+cursor: grabbing;
+}
+
+.entity-card.enemy-card {
+border-color: #5c3d3d;
+}
+
+.entity-card.enemy-card:hover {
+border-color: var(--accent-red);
+box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}
+
+.entity-card.downed {
+opacity: 0.5;
+filter: grayscale(0.8);
+border-color: #888;
+}
+
+/* HP Bar Display */
+.hp-bar-container {
+margin-top: 8px;
+background: #121218;
+height: 10px;
+border-radius: 5px;
+overflow: hidden;
+border: 1px solid #333;
+}
+
+.hp-bar-fill {
+height: 100%;
+width: 100%;
+background: var(--accent-green);
+transition: width 0.3s ease;
+}
+
+.enemy-card .hp-bar-fill {
+background: var(--accent-red);
+}
+
+/* --- COMBAT LOG --- */
+#combat-log {
+background: var(--bg-primary);
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius);
+height: 80px;
+padding: 10px 14px;
+font-size: 13px;
+overflow-y: auto;
+margin-top: 12px;
+box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.log-entry {
+margin-bottom: 4px;
+color: var(--text-muted);
+animation: fadeIn 0.2s ease;
+}
+
+.log-entry strong {
+color: var(--accent-gold);
+}
+
+/* --- INSPECT MODAL OVERLAY --- */
+.modal-overlay {
+display: none;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(10, 10, 16, 0.85);
+backdrop-filter: blur(4px);
+z-index: 100;
+justify-content: center;
+align-items: center;
+opacity: 0;
+transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+display: flex;
+opacity: 1;
+}
+
+.modal-card {
+background: var(--bg-card);
+border: 2px solid var(--accent-cyan);
+border-radius: 16px;
+padding: 24px;
+width: 480px;
+max-width: 90%;
+box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2);
+animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-card hr {
+border: none;
+border-top: 1px solid var(--border-color);
+margin: 12px 0;
+}
+
+/* --- ALMANAC COMPENDIUM TAB SYSTEM --- */
+.almanac-tabs {
+display: flex;
+gap: 8px;
+margin-bottom: 16px;
+}
+
+.tab-btn {
+flex: 1;
+padding: 10px;
+background: var(--bg-primary);
+border: 1px solid var(--border-color);
+color: var(--text-muted);
+border-radius: 8px;
+cursor: pointer;
+font-weight: 600;
+transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+background: var(--accent-cyan);
+color: #121218;
+border-color: var(--accent-cyan);
+box-shadow: 0 0 10px var(--accent-cyan-glow);
+}
+
+.almanac-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 12px;
+flex: 1;
+overflow-y: auto;
+padding-right: 6px;
+}
+
+.almanac-entry-card {
+background: var(--bg-primary);
+border: 1px solid var(--border-color);
+border-radius: 8px;
+padding: 12px;
+transition: border-color 0.2s ease;
+}
+
+.almanac-entry-card.discovered {
+border-color: var(--accent-gold);
+}
+
+.almanac-entry-card.locked {
+opacity: 0.5;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(4px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalPop {
+from { transform: scale(0.85); opacity: 0; }
+to { transform: scale(1); opacity: 1; }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+width: 6px;
+}
+::-webkit-scrollbar-track {
+background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+background: var(--border-color);
+border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: var(--accent-cyan);
+}
