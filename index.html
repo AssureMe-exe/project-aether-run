@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Aether Run - Roguelite Engine</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game-container">
+
+<!-- ==========================================
+1. TITLE SCREEN
+========================================== -->
+<div id="screen-title" class="screen active">
+<h1>PROJECT AETHER RUN</h1>
+<p>A 200-Wave Turn-Based Roguelite Engine</p>
+<div style="margin-top: 30px; display: flex; flex-direction: column; gap: 12px; width: 280px;">
+<button onclick="app.showScreen('screen-hub')">Enter Hub (Base Camp)</button>
+<button class="secondary" onclick="app.startCharacterCreation()">Start New Run</button>
+<button class="secondary" onclick="app.openAlmanac()">View Almanac</button>
+</div>
+</div>
+
+<!-- ==========================================
+2. HUB BASE CAMP
+========================================== -->
+<div id="screen-hub" class="screen">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+<h2>HUB BASE CAMP</h2>
+<div>🔮 Soul Shards: <span id="hub-shards-display" style="color: var(--accent-gold); font-weight: bold;">0</span></div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex: 1;">
+<div class="entity-card" style="cursor: default;">
+<h3>🏰 Guild Hall</h3>
+<p>Unlock new hero classes and advance per-class skill trees using Soul Shards.</p>
+<button style="margin-top: 12px;" onclick="app.openGuildHall()">Manage Classes</button>
+</div>
+<div class="entity-card" style="cursor: default;">
+<h3>⚔️ Training Grounds</h3>
+<p>Purchase account-wide permanent upgrades like starting rest charges and stat bonuses.</p>
+<button style="margin-top: 12px;" onclick="app.openTrainingGrounds()">Upgrade Account</button>
+</div>
+<div class="entity-card" style="cursor: default;">
+<h3>📖 The Great Library</h3>
+<p>Read the complete compendium of classes, bestiary mobs, items, and meta events.</p>
+<button style="margin-top: 12px;" class="secondary" onclick="app.openAlmanac()">Open Almanac</button>
+</div>
+<div class="entity-card" style="cursor: default; border-color: var(--accent-gold);">
+<h3>🚀 Embark Gateway</h3>
+<p>Form your 3-character party and step into the 200-wave gauntlet.</p>
+<button style="margin-top: 12px;" onclick="app.startCharacterCreation()">Assemble Party & Launch</button>
+</div>
+</div>
+
+<button class="secondary" style="margin-top: 16px; width: 160px;" onclick="app.showScreen('screen-title')">Back to Title</button>
+</div>
+
+<!-- ==========================================
+3. MII PARTY CREATOR & EMBARK SCREEN
+========================================== -->
+<div id="screen-creator" class="screen">
+<h2>PARTY CREATION (MII AVATAR SYSTEM)</h2>
+<p>Customize your 3 party heroes and assign their starting classes.</p>
+
+<div id="creator-slots" style="display: flex; gap: 16px; margin: 20px 0; flex: 1;">
+<!-- Injected dynamically via app.renderCreatorSlots() -->
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<button class="secondary" onclick="app.showScreen('screen-hub')">Cancel</button>
+<button onclick="app.confirmPartyAndLaunch()">Launch Gauntlet Run ➔</button>
+</div>
+</div>
+
+<!-- ==========================================
+4. COMBAT ARENA SCREEN
+========================================== -->
+<div id="screen-combat" class="screen">
+<!-- HUD Header -->
+<div id="hud">
+<div class="hud-stat">🌊 <span id="wave-display">Wave: 1 / 200</span></div>
+<div class="hud-stat">💰 Gold: <span id="gold-display">0</span></div>
+<div class="hud-stat">🏕️ Rest Charges: <span id="rest-display">2</span></div>
+
+<!-- Ultimate Soul Ember Gauge -->
+<div class="ultimate-container">
+<span style="font-size: 13px; font-weight: bold; color: var(--accent-cyan);">SOUL EMBER:</span>
+<div id="ultimate-bar-outer">
+<div id="ultimate-fill"></div>
+</div>
+</div>
+</div>
+
+<!-- Main Battlefield -->
+<div id="battlefield">
+<!-- Party Column -->
+<div class="combat-column" id="party-column">
+<!-- Injected via JavaScript -->
+</div>
+
+<div style="text-align: center; font-size: 13px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+💡 <strong>Drag & Drop Controls:</strong><br>
+• Drag Hero ➔ Enemy = Execute Attack<br>
+• Drag Hero ➔ Ally = Support / Buff<br>
+• Tap Hero directly = Self Stance<br>
+• <strong>Click & Hold</strong> any entity to Inspect Traits/Moves!
+</div>
+
+<!-- Enemy Column -->
+<div class="combat-column" id="enemy-column">
+<!-- Injected via JavaScript -->
+</div>
+</div>
+
+<!-- Combat Log -->
+<div id="combat-log">
+<div class="log-entry">Gauntlet initiated. Drag your heroes to attack or support!</div>
+</div>
+</div>
+
+<!-- ==========================================
+5. META EVENT SCREEN
+========================================== -->
+<div id="screen-event" class="screen" style="justify-content: center; align-items: center; text-align: center;">
+<div style="background: var(--bg-card); border: 2px solid var(--accent-gold); border-radius: 16px; padding: 30px; width: 560px; max-width: 90%;">
+<h2 id="event-title" style="color: var(--accent-gold);">Mysterious Encounter</h2>
+<p id="event-desc" style="margin: 16px 0 24px 0; font-size: 16px;">An event approaches...</p>
+<div id="event-choices" style="display: flex; flex-direction: column; gap: 12px;">
+<!-- Injected dynamically -->
+</div>
+</div>
+</div>
+
+<!-- ==========================================
+6. ALMANAC COMPENDIUM SCREEN
+========================================== -->
+<div id="screen-almanac" class="screen">
+<h2>THE GREAT ALMANAC</h2>
+
+<div class="almanac-tabs">
+<button class="tab-btn active" onclick="app.switchAlmanacTab('classes', this)">Classes</button>
+<button class="tab-btn" onclick="app.switchAlmanacTab('enemies', this)">Bestiary</button>
+<button class="tab-btn" onclick="app.switchAlmanacTab('items', this)">Items & Relics</button>
+<button class="tab-btn" onclick="app.switchAlmanacTab('events', this)">Events</button>
+</div>
+
+<div class="almanac-grid" id="almanac-grid-container">
+<!-- Injected dynamically -->
+</div>
+
+<button class="secondary" style="margin-top: 16px; width: 140px;" onclick="app.showScreen('screen-hub')">Close</button>
+</div>
+
+<!-- ==========================================
+7. INSPECT OVERLAY MODAL (CLICK & HOLD)
+========================================== -->
+<div id="inspect-modal" class="modal-overlay">
+<!-- Injected dynamically on click-and-hold via CombatEngine -->
+</div>
+
+</div>
+
+<!-- ==========================================
+MAIN JAVASCRIPT APPLICATION SCRIPT
+========================================== -->
+<script type="module">
+import { CONFIG } from './js/config.js';
+import { GameState } from './js/state.js';
+import { MiiAvatar } from './js/mii.js';
+import { CLASS_ROSTER } from './js/classes.js';
+import { Enemy, ENEMY_TAGS, REGULAR_ENEMIES, MINIBOSSES, MAJOR_BOSSES, FINAL_BOSS } from './js/enemies.js';
+import { META_EVENTS_DATABASE, ITEM_DATABASE } from './js/database.js';
+import { CombatEngine } from './js/combat.js';
+import { Almanac } from './js/almanac.js';
+import { HubEngine } from './js/hub.js';
+
+class App {
+constructor() {
+this.combat = new CombatEngine();
+this.activeAlmanacTab = "classes";
+this.creatorParty = [
+{ name: "Hero 1", classId: "warrior", mii: new MiiAvatar({ hairStyle: "spiky", skinTone: "#f5c6a5" }) },
+{ name: "Hero 2", classId: "cleric", mii: new MiiAvatar({ hairStyle: "long", skinTone: "#e0ac69" }) },
+{ name: "Hero 3", classId: "mage", mii: new MiiAvatar({ hairStyle: "curly", skinTone: "#8d5524" }) }
+];
+}
+
+init() {
+GameState.loadSave();
+this.updateHubUI();
+}
+
+showScreen(screenId) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+const target = document.getElementById(screenId);
+if (target) {
+target.classList.add('active');
+}
+if (screenId === 'screen-hub') {
+this.updateHubUI();
+}
+}
+
+updateHubUI() {
+const data = HubEngine.getHubOverviewData();
+const display = document.getElementById("hub-shards-display");
+if (display) display.innerText = data.soulShards;
+}
+
+// --- PARTY CREATION ---
+startCharacterCreation() {
+this.renderCreatorSlots();
+this.showScreen('screen-creator');
+}
+
+renderCreatorSlots() {
+const container = document.getElementById('creator-slots');
+container.innerHTML = "";
+
+this.creatorParty.forEach((hero, idx) => {
+let classOptionsHtml = "";
+GameState.meta.unlockedClasses.forEach(cKey => {
+const cData = CLASS_ROSTER[cKey];
+const selected = hero.classId === cKey ? "selected" : "";
+classOptionsHtml += `<option value="${cKey}" ${selected}>${cData.name}</option>`;
+});
+
+container.innerHTML += `
+<div class="entity-card" style="flex: 1; cursor: default;">
+<h3>Slot ${idx + 1}</h3>
+<div style="margin: 12px 0;">
+<label style="font-size: 12px; color: var(--text-muted);">Hero Name:</label>
+<input type="text" value="${hero.name}" onchange="app.creatorParty[${idx}].name = this.value" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: #fff; margin-top: 4px;">
+</div>
+<div>
+<label style="font-size: 12px; color: var(--text-muted);">Class Assignment:</label>
+<select onchange="app.creatorParty[${idx}].classId = this.value" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: #fff; margin-top: 4px;">
+${classOptionsHtml}
+</select>
+</div>
+</div>
+`;
+});
+}
+
+confirmPartyAndLaunch() {
+const party = this.creatorParty.map(h => {
+const cData = CLASS_ROSTER[h.classId];
+return {
+name: h.name,
+classData: cData,
+hp: cData.baseStats.hp,
+maxHp: cData.baseStats.hp,
+str: cData.baseStats.str,
+def: cData.baseStats.def,
+lck: cData.baseStats.lck,
+dex: cData.baseStats.dex,
+mii: h.mii,
+debuffs: []
+};
+});
+
+GameState.startNewRun(party);
+this.spawnWaveEnemies();
+this.renderCombatUI();
+this.showScreen('screen-combat');
+}
+
+// --- COMBAT WAVE SPAWNING ---
+spawnWaveEnemies() {
+const wave = GameState.run.wave;
+let spawned = [];
+
+if (wave === 200) {
+spawned.push(new Enemy(FINAL_BOSS));
+} else if (wave % CONFIG.MAJOR_BOSS_INTERVAL === 0) {
+const boss = MAJOR_BOSSES[Math.floor(Math.random() * MAJOR_BOSSES.length)];
+spawned.push(new Enemy(boss));
+GameState.run.bossesSlain++;
+} else if (wave % CONFIG.MINIBOSS_INTERVAL === 0) {
+const miniboss = MINIBOSSES[Math.floor(Math.random() * MINIBOSSES.length)];
+spawned.push(new Enemy(miniboss));
+} else {
+// Spawn 2-3 standard mobs
+const count = Math.random() < 0.5 ? 2 : 3;
+for (let i = 0; i < count; i++) {
+const mob = REGULAR_ENEMIES[Math.floor(Math.random() * REGULAR_ENEMIES.length)];
+spawned.push(new Enemy(mob));
+}
+}
+
+GameState.run.activeEnemies = spawned;
+spawned.forEach(e => Almanac.recordDiscovery("enemiesDiscovered", e.id));
+}
+
+renderCombatUI() {
+// Render HUD
+document.getElementById('wave-display').innerText = `Wave: ${GameState.run.wave} / 200`;
+document.getElementById('gold-display').innerText = GameState.run.gold;
+document.getElementById('rest-display').innerText = GameState.run.restCharges;
+
+const ultFill = document.getElementById('ultimate-fill');
+ultFill.style.width = `${GameState.run.ultimateGauge}%`;
+if (GameState.run.ultimateGauge >= 100) ultFill.classList.add('ready');
+else ultFill.classList.remove('ready');
+
+// Render Party Column
+const partyCol = document.getElementById('party-column');
+partyCol.innerHTML = "";
+GameState.run.party.forEach((p, idx) => {
+const isDead = p.hp <= 0;
+partyCol.innerHTML += `
+<div class="entity-card ${isDead ? 'downed' : ''}"
+draggable="${!isDead}"
+ondragstart="app.combat.draggedPartyIdx = ${idx}"
+onmousedown="app.combat.startInspectHold(GameState.run.party[${idx}], 'party', event)"
+onmouseup="app.combat.cancelInspectHold()"
+onclick="if(!isDead) app.combat.executeSelfTarget(${idx}); app.renderCombatUI();">
+<strong>${p.name}</strong> (${p.classData.name})<br>
+<small>HP: ${p.hp} / ${p.maxHp}</small>
+<div class="hp-bar-container">
+<div class="hp-bar-fill" style="width: ${(p.hp / p.maxHp) * 100}%"></div>
+</div>
+${GameState.run.ultimateGauge >= 100 ? `<button style="margin-top:8px; padding:4px 8px; font-size:11px;" onclick="event.stopPropagation(); app.combat.executeUltimate(${idx}); app.renderCombatUI();">🔥 ULTIMATE</button>` : ''}
+</div>
+`;
+});
+
+// Render Enemy Column
+const enemyCol = document.getElementById('enemy-column');
+enemyCol.innerHTML = "";
+GameState.run.activeEnemies.forEach((e, idx) => {
+enemyCol.innerHTML += `
+<div class="entity-card enemy-card ${e.isDowned ? 'downed' : ''}"
+ondragover="event.preventDefault()"
+ondrop="event.preventDefault(); app.combat.executeDragAttack(app.combat.draggedPartyIdx, ${idx}); app.renderCombatUI();"
+onmousedown="app.combat.startInspectHold(GameState.run.activeEnemies[${idx}], 'enemy', event)"
+onmouseup="app.combat.cancelInspectHold()">
+<strong>${e.name}</strong> ${e.isDowned ? '(DOWNED)' : ''}<br>
+<small>HP: ${e.hp} / ${e.maxHp} | ATK: ${e.getAttackPower(GameState.run.ultimateGauge)}</small>
+<div class="hp-bar-container">
+<div class="hp-bar-fill" style="width: ${(e.hp / e.maxHp) * 100}%"></div>
+</div>
+</div>
+`;
+});
+
+// Render Logs
+const logBox = document.getElementById('combat-log');
+logBox.innerHTML = GameState.run.runLogs.map(l => `<div class="log-entry">${l}</div>`).join('');
+logBox.scrollTop = logBox.scrollHeight;
+
+// Check Wave Clear Condition
+if (GameState.run.activeEnemies.length === 0) {
+this.advanceWave();
+}
+}
+
+advanceWave() {
+GameState.run.wave++;
+if (GameState.run.wave > 200) {
+alert("VICTORY! You have conquered the 200-wave Aether Gauntlet!");
+this.showScreen('screen-hub');
+return;
+}
+
+// Trigger Event Choice Node every 5 waves
+if (GameState.run.wave % CONFIG.CHOICE_NODE_INTERVAL === 0) {
+this.triggerMetaEvent();
+} else {
+this.spawnWaveEnemies();
+this.renderCombatUI();
+}
+}
+
+triggerMetaEvent() {
+const evt = META_EVENTS_DATABASE[Math.floor(Math.random() * META_EVENTS_DATABASE.length)];
+Almanac.recordDiscovery("eventsDiscovered", evt.id);
+
+document.getElementById('event-title').innerText = evt.name;
+document.getElementById('event-desc').innerText = evt.desc;
+
+const choicesBox = document.getElementById('event-choices');
+choicesBox.innerHTML = "";
+evt.choices.forEach(c => {
+choicesBox.innerHTML += `
+<button onclick="app.resolveEventChoice('${c.action}')">${c.text}</button>
+`;
+});
+
+this.showScreen('screen-event');
+}
+
+resolveEventChoice(action) {
+GameState.addLog(`Event choice resolved: ${action}`);
+this.spawnWaveEnemies();
+this.renderCombatUI();
+this.showScreen('screen-combat');
+}
+
+// --- ALMANAC COMPENDIUM ---
+openAlmanac() {
+this.renderAlmanacGrid("classes");
+this.showScreen('screen-almanac');
+}
+
+switchAlmanacTab(category, btnElem) {
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+if (btnElem) btnElem.classList.add('active');
+this.renderAlmanacGrid(category);
+}
+
+renderAlmanacGrid(category) {
+const container = document.getElementById('almanac-grid-container');
+container.innerHTML = "";
+const entries = Almanac.getAllCategoryEntries(category);
+
+entries.forEach(e => {
+if (!e) return;
+const isDiscovered = e.discovered !== false && e.unlocked !== false;
+container.innerHTML += `
+<div class="almanac-entry-card ${isDiscovered ? 'discovered' : 'locked'}">
+<h3>${e.name}</h3>
+<p>${e.effect || e.desc || e.lore || 'Details undiscovered.'}</p>
+${e.quip ? `<small style="display:block; margin-top:6px; color:var(--accent-gold);">"${e.quip}"</small>` : ''}
+</div>
+`;
+});
+}
+}
+
+// Attach global app instance
+window.app = new App();
+window.GameState = GameState;
+window.app.init();
+</script>
+</body>
+</html>
